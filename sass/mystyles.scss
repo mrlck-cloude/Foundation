@@ -1,0 +1,7 @@
+@import './_settings';
+@import 'foundation';
+@import 'foundation';
+
+@include foundation-everything($prototype: true);
+
+// here you write your own styles

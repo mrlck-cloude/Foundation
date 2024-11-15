@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.6.3/css/foundation.min.css">
+    <title>Bit-Academy Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/6.6.3/js/foundation.min.js"></script>
+
+    <link
+        href="https://cdn.prod.website-files.com/6433e2279fd61134d70bd465/643b387d4581275fb1daa5b6_63c1328bf02e2dcf52767cdc_BA_Favicon.svg"
+        rel="shortcut icon" type="image/x-icon" />
+
+    <style>
+        .stats-list {
+            list-style-type: none;
+            clear: left;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .stats-list .stats-list-positive {
+            color: #3adb76;
+        }
+
+        .stats-list .stats-list-negative {
+            color: #cc4b37;
+        }
+
+        .stats-list>li {
+            display: inline-block;
+            margin-right: 10px;
+            padding-right: 10px;
+            border-right: 1px solid #cacaca;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .stats-list>li:last-child {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .stats-list>li .stats-list-label {
+            display: block;
+            margin-top: 2px;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        .searchbar {
+            margin: 1rem;
+        }
+
+        .search-field {
+            width: 0;
+            height: 40px;
+            margin-left: 1rem;
+            padding: 0;
+            border-radius: 50px;
+            border: none;
+            transition: all 0.5s ease;
+        }
+
+        .expand-search {
+            width: 80%;
+            max-width: calc(80% - 3rem);
+            border: 1px solid #c9c9c9;
+            padding: .5rem;
+        }
+
+        svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .button {
+            border-radius: 50px;
+        }
+
+        .bar-graph {
+            padding: 0;
+            width: 100%;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-align-items: flex-end;
+            -ms-flex-align: end;
+            align-items: flex-end;
+            height: 425px;
+            margin: 0;
+        }
+
+        .bar-graph li {
+            display: block;
+            padding: 1.5625rem 0;
+            position: relative;
+            text-align: center;
+            border-radius: 4px 4px 0 0;
+            max-width: 20%;
+            height: 100%;
+            margin: 0 1.8% 0 0;
+            -webkit-flex: 1 1 15%;
+            -ms-flex: 1 1 15%;
+            flex: 1 1 15%;
+        }
+
+        .bar-graph .bar-graph-axis {
+            -webkit-flex: 1 1 8%;
+            -ms-flex: 1 1 8%;
+            flex: 1 1 8%;
+            display: -webkit-flex;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-flex-direction: column;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            -webkit-justify-content: space-between;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+        }
+
+        .bar-graph .bar-graph-label {
+            margin: 0;
+            background-color: none;
+            color: #8a8a8a;
+            position: relative;
+        }
+
+        @media print,
+        screen and (min-width: 40em) {
+
+            .bar-graph .bar-graph-label:before,
+            .bar-graph .bar-graph-label:after {
+                content: "";
+                position: absolute;
+                border-bottom: 1px dashed #8a8a8a;
+                top: 0;
+                left: 0;
+                height: 50%;
+                width: 20%;
+            }
+        }
+
+        @media print,
+        screen and (min-width: 40em) and (min-width: 64em) {
+
+            .bar-graph .bar-graph-label:before,
+            .bar-graph .bar-graph-label:after {
+                width: 30%;
+            }
+        }
+
+        @media print,
+        screen and (min-width: 40em) {
+            .bar-graph .bar-graph-label:after {
+                left: auto;
+                right: 0;
+            }
+        }
+
+        .bar-graph .percent {
+            letter-spacing: -3px;
+            opacity: 0.4;
+            width: 100%;
+            font-size: 1.875rem;
+            position: absolute;
+        }
+
+        @media print,
+        screen and (min-width: 40em) {
+            .bar-graph .percent {
+                font-size: 3.875rem;
+            }
+        }
+
+        .bar-graph .percent span {
+            font-size: 1.875rem;
+        }
+
+        .bar-graph .description {
+            font-weight: 800;
+            opacity: 0.5;
+            text-transform: uppercase;
+            width: 100%;
+            font-size: 14px;
+            bottom: 20px;
+            position: absolute;
+            font-size: 1rem;
+            overflow: hidden;
+        }
+
+        .bar-graph .bar.primary {
+            border: 1px solid #1779ba;
+            background: linear-gradient(#2196e3, #1779ba 70%);
+        }
+
+        .bar-graph .bar.secondary {
+            border: 1px solid #767676;
+            background: linear-gradient(#909090, #767676 70%);
+        }
+
+        .bar-graph .bar.success {
+            border: 1px solid #3adb76;
+            background: linear-gradient(#65e394, #3adb76 70%);
+        }
+
+        .bar-graph .bar.warning {
+            border: 1px solid #ffae00;
+            background: linear-gradient(#ffbe33, #ffae00 70%);
+        }
+
+        .bar-graph .bar.alert {
+            border: 1px solid #cc4b37;
+            background: linear-gradient(#d67060, #cc4b37 70%);
+        }
+
+        .circle-graph {
+            width: 11.25rem;
+            height: 11.25rem;
+            border-radius: 50%;
+            background-color: #8a8a8a;
+            position: relative;
+        }
+
+        .circle-graph.gt-50 {
+            background-color: #1779ba;
+        }
+
+        .circle-graph-progress {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            left: calc(50% - 5.625rem);
+            top: calc(50% - 5.625rem);
+            width: 11.25rem;
+            height: 11.25rem;
+            clip: rect(0, 11.25rem, 11.25rem, 5.625rem);
+        }
+
+        .circle-graph-progress .circle-graph-progress-fill {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            left: calc(50% - 5.625rem);
+            top: calc(50% - 5.625rem);
+            width: 11.25rem;
+            height: 11.25rem;
+            clip: rect(0, 5.625rem, 11.25rem, 0);
+            background: #1779ba;
+            -webkit-transform: rotate(60deg);
+            -ms-transform: rotate(60deg);
+            transform: rotate(60deg);
+        }
+
+        .gt-50 .circle-graph-progress {
+            clip: rect(0, 5.625rem, 11.25rem, 0);
+        }
+
+        .gt-50 .circle-graph-progress .circle-graph-progress-fill {
+            clip: rect(0, 11.25rem, 11.25rem, 5.625rem);
+            background: #8a8a8a;
+        }
+
+        .circle-graph-percents {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            left: calc(50% - 7.75862rem/2);
+            top: calc(50% - 7.75862rem/2);
+            width: 7.75862rem;
+            height: 7.75862rem;
+            background: #e6e6e6;
+            text-align: center;
+            display: table;
+            z-index: 4;
+        }
+
+        .circle-graph-percents .circle-graph-percents-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1779ba;
+        }
+
+        .circle-graph-percents .circle-graph-percents-units {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .circle-graph-percents-wrapper {
+            display: table-cell;
+            vertical-align: middle;
+            line-height: 0;
+        }
+
+        .circle-graph-percents-wrapper span {
+            line-height: 1;
+        }
+
+        .grid-container {
+            padding: 20px;
+        }
+
+        .grid-x {
+            margin-bottom: 20px;
+        }
+
+        .vertical.menu {
+            background-color: #f7f7f7;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .vertical.menu li {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .vertical.menu li:last-child {
+            border-bottom: none;
+        }
+
+        .vertical.menu a {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        .vertical.menu a:hover {
+            color: #23527c;
+        }
+
+        .card {
+            background-color: #f7f7f7;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .card-divider {
+            background-color: #337ab7;
+            color: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #337ab7;
+        }
+
+        .card-section {
+            padding: 20px;
+        }
+
+        .circle-graph {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #f7f7f7;
+            border: 1px solid #ddd;
+        }
+
+        .circle-graph-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            clip-path: circle(50% at 50% 50%);
+        }
+
+        .circle-graph-progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #337ab7;
+            transform-origin: center;
+        }
+
+        .circle-graph-percents {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .circle-graph-percents-number {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .circle-graph-percents-units {
+            font-size: 14px;
+        }
+
+        .gt-50 {
+            background-color: #5cb85c;
+        }
+
+        img {
+            width: 5%;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="grid-container">
+        <div class="grid-x grid-margin-x">
+            <div class="cell medium-3">
+                <h4>Navigation</h4>
+                <ul class="vertical menu">
+                    <li><a href="#">Materials</a></li>
+                    <li><a href="#">Classes</a></li>
+                    <li><a href="#">Progress</a></li>
+                    <li><a href="#">Statistics</a></li>
+                    <li><a href="#">Testing</a></li>
+                    <li><a href="#">Meetings</a></li>
+                    <li><a href="#">Settings</a></li>
+                    <li><a href="#">Log out</a></li>
+                </ul>
+            </div>
+
+            <div class="cell medium-9">
+                <img src="images.png" alt="bit logo">
+                <h1>Bit-Academy Dashboard</h1>
+                <div class=" input-group searchbar">
+                    <div class="input-group-button">
+                        <button class="button search"><svg width="100" height="100" viewBox="0 0 100 100">
+                                <path fill="#FFF" fill-rule="evenodd"
+                                    d="M42.117,12.246 C50.1209,12.246 57.797,15.4257 63.453,21.0858 C69.1132,26.742 72.2928,34.4178 72.2928,42.4218 C72.2928,50.4258 69.1131,58.1018 63.453,63.7578 C57.7968,69.418 50.121,72.5976 42.117,72.5976 C34.1131,72.5976 26.437,69.4179 20.781,63.7578 C15.1208,58.1016 11.9412,50.4258 11.9412,42.4218 C11.9412,34.4178 15.1209,26.7418 20.781,21.0858 C26.4372,15.4256 34.113,12.246 42.117,12.246 L42.117,12.246 Z M76.0828827,67.3362833 C82.3527829,58.7859894 85.2617455,48.0434678 83.9173,37.22271 C82.0618,22.28871 72.3743,9.47671 58.5153,3.61771 L58.51139,3.61771 C53.32389,1.41851 47.74139,0.28961 42.10539,0.29741 L42.117,0.305 C29.058,0.30891 16.742,6.3675 8.769001,16.707 C0.7924008,27.047 -1.933999,40.5 1.382301,53.129 C4.698701,65.758 13.6833,76.137 25.7103,81.223 L25.7103,81.22691 C39.5733,87.08631 55.5113,85.10191 67.5153,76.02771 C67.5852345,75.9748392 67.6549736,75.9217748 67.724517,75.8685177 L91.555,99.6990032 L100.0003,91.253703 L76.0828827,67.3362833 Z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <input class="input-field search-field" type="search" placeholder="Search" />
+                </div>
+
+
+                <div class="grid-x grid-margin-x">
+                    <div class="cell medium-6">
+                        <div class="card">
+                            <div class="card-divider">
+                                <h4>Student Profile</h4>
+                            </div>
+                            <div class="card-section">
+                                <p><strong>Name:</strong> Gabriela Richardson</p>
+                                <p><strong>School:</strong> Harvey Mudd College, California</p>
+                                <p><strong>Age:</strong> 15</p>
+                                <p><strong>Mother:</strong> Tyrell Mccaffrey</p>
+                                <p><strong>Father:</strong> Usman Rankin</p>
+                                <a href="#" class="button">View Full Profile</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cell medium-6">
+                        <div class="card">
+                            <div class="card-divider">
+                                <h4>Academic Performance</h4>
+                            </div>
+                            <div class="card-section">
+                                <p><strong>Average Mark:</strong> C</p>
+                                <p><strong>Friends:</strong> 78</p>
+                                <p><strong>Recent Marks:</strong></p>
+                                <ul>
+                                    <li>03/20</li>
+                                    <li>06/20</li>
+                                    <li>09/20</li>
+                                    <li>12/20</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cell medium-6">
+                        <div class="card">
+                            <div class="card-divider">
+                                <h4>Personal Recommendations</h4>
+                            </div>
+                            <div class="card-section">
+                                <p><strong>High Stress Level:</strong> Personal psychological consultation recommended
+                                </p>
+                                <p><strong>Afterschool Programs:</strong> A penchant for art. Drawing classes
+                                    recommended</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cell medium-6">
+                        <div class="card">
+                            <div class="card-divider">
+                                <h4>Medical History</h4>
+                            </div>
+                            <div class="card-section">
+                                <p><strong>Anxiety Disorder:</strong> Consultation recommended (F41.9)</p>
+                                <p><strong>Mild Depressive Episode:</strong> Cured (F32.0)</p>
+                                <a href="#" class="button">See Full History</a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="circle-graph" data-circle-graph data-percent="50">
+                        <div class="circle-graph-progress">
+                            <div class="circle-graph-progress-fill"></div>
+                        </div>
+                        <div class="circle-graph-percents">
+                            <div class="circle-graph-percents-wrapper">
+                                <span class="circle-graph-percents-number"></span>
+                                <span class="circle-graph-percents-units">of 100</span>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="stats-list">
+                        <li>
+                            135 <span class="stats-list-label">Commits</span>
+                        </li>
+                        <li class="stats-list-positive">
+                            17,678 <span class="stats-list-label">Additions</span>
+                        </li>
+                        <li class="stats-list-negative">
+                            2,390 <span class="stats-list-label">Deletions</span>
+                        </li>
+                    </ul>
+
+                    <ul class="bar-graph">
+                        <li class="bar-graph-axis">
+                            <div class="bar-graph-label">100%</div>
+                            <div class="bar-graph-label">80%</div>
+                            <div class="bar-graph-label">60%</div>
+                            <div class="bar-graph-label">20%</div>
+                            <div class="bar-graph-label">40%</div>
+                            <div class="bar-graph-label">0%</div>
+                        </li>
+                        <li class="bar primary" style="height: 95%;" title="95">
+                            <div class="percent">95<span>%</span></div>
+                            <div class="description">PHP-Novice</div>
+                        </li>
+                        <li class="bar secondary" style="height: 90%;" title="90">
+                            <div class="percent">90<span>%</span></div>
+                            <div class="description">PHP-web</div>
+                        </li>
+                        <li class="bar success" style="height: 80%;" title="80">
+                            <div class="percent">80<span>%</span></div>
+                            <div class="description">C#</div>
+                        </li>
+                        <li class="bar warning" style="height: 75%;" title="75">
+                            <div class="percent">75<span>%</span></div>
+                            <div class="description">PHP-Beginner</div>
+                        </li>
+                        <li class="bar alert" style="height: 40%;" title="40">
+                            <div class="percent">40<span>%</span></div>
+                            <div class="description">Database</div>
+                        </li>
+                    </ul>
+                    <h3>Data Punten</h3>
+                    <table class="hover">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Person</th>
+                                <th>Cursus</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>01-01-2024</td>
+                                <td>Naam</td>
+                                <td>PHP-Novice</td>
+                                <td>Voltooid</td>
+                            </tr>
+                            <tr>
+                                <td>02-01-2024</td>
+                                <td>Naam
+                                </td>
+                                <td>PHP-web</td>
+                                <td>In Progress</td>
+                            </tr>
+                            <tr>
+                                <td>03-01-2024</td>
+                                <td>Naam</td>
+                                <td>C#</td>
+                                <td>Voltooid</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Voeg een nieuw datapunt toe</h3>
+                    <form>
+                        <div class="grid-x grid-margin-x">
+                            <div class="cell medium-4">
+                                <label>Datum
+                                    <input type="date" required>
+                                </label>
+                            </div>
+                            <div class="cell medium-4">
+                                <label>Person
+                                    <input type="text" required>
+                                </label>
+                            </div>
+                            <div class="cell medium-4">
+                                <label>Cursus
+                                    <input type="text" required>
+                                </label>
+                            </div>
+                            <div class="cell medium-4">
+                                <label>Status
+                                    <select required>
+                                        <option value="voltooid">Voltooid</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="niet_voltooid">Niet Voltooid</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="cell medium-4">
+                                <button type="submit" class="button">Voeg toe</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).foundation();
+        $("[data-circle-graph]").each(function () {
+            var $graph = $(this),
+                percent = parseInt($graph.data('percent'), 10),
+                deg = 360 * percent / 100;
+            if (percent > 50) {
+                $graph.addClass('gt-50');
+            }
+            $graph.find('.circle-graph-progress-fill').css('transform', 'rotate(' + deg + 'deg)');
+            $graph.find('.circle-graph-percents-number').html(percent + '%');
+        });
+        $(document).foundation();
+
+        $(function () {
+            $('.search')
+                .bind('click', function (event) {
+                    $(".search-field").toggleClass("expand-search");
+
+                    // if the search field is expanded, focus on it
+                    if ($(".search-field").hasClass("expand-search")) {
+                        $(".search-field").focus();
+                    }
+                })
+        });
+
+    </script>
+</body>
+
+</html>
